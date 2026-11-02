@@ -1047,7 +1047,7 @@ function AdminDashboardView({ currentUser, showToast, onOpenLogin }) {
       });
       const data = await res.json();
       if (data.success) {
-        showToast(`Administrator '${newAdminUsername}' added! Saved to credentials.txt`, 'success');
+        showToast(`Administrator '${newAdminUsername}' created successfully!`, 'success');
         setNewAdminUsername('');
         setNewAdminPassword('');
         setNewAdminFullName('');
@@ -1881,14 +1881,6 @@ function AuthModal({ initialTab, onClose, onSuccess, showToast }) {
           >
             <i className="fa-solid fa-user-plus"></i> Register
           </button>
-        </div>
-
-        {/* SECURITY & CREDENTIALS INFO NOTICE */}
-        <div className="auth-notice-box">
-          <i className="fa-solid fa-file-lines" style={{ color: 'var(--accent)', fontSize: '1.1rem' }}></i>
-          <div>
-            System login credentials are saved in <strong>credentials.txt</strong> in your project folder.
-          </div>
         </div>
 
         <form onSubmit={handleSubmit}>
