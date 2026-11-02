@@ -158,3 +158,14 @@ class GrievanceSystemTests(TestCase):
         # Verify newly created admin can access admin grievances
         admin_res = new_client.get('/api/admin/grievances/')
         self.assertEqual(admin_res.status_code, 200)
+
+    def test_static_files_served(self):
+        """Test that static CSS and JS are served properly even in production."""
+        resp = self.client.get('/static/js/app.js')
+        self.assertEqual(resp.status_code, 200)
+        body = b''.join(resp.streaming_content).decode('utf-8')
+        self.assertIn('App', body)
+
+        css_resp = self.client.get('/static/css/style.css')
+        self.assertEqual(css_resp.status_code, 200)
+
