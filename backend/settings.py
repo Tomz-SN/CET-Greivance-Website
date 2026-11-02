@@ -1,13 +1,14 @@
 from pathlib import Path
 import os
+import shutil
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-x%wl&+f2cfcaex6*!m8d57hy@%+9^4$a0be@5zk!_8v03gic=2'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-x%wl&+f2cfcaex6*!m8d57hy@%+9^4$a0be@5zk!_8v03gic=2')
 
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*', '.vercel.app', 'localhost', '127.0.0.1']
 
 # Application definition
 INSTALLED_APPS = [
@@ -24,7 +25,6 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    # Note: We can handle CSRF or exempt API calls that use JSON/tokens
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -50,10 +50,27 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
+# Database configuration:
+# On Vercel, the root filesystem is read-only except /tmp.
+# We copy db.sqlite3 to /tmp if running on Vercel to prevent 'readonly database' error.
+IS_VERCEL = os.environ.get('VERCEL') == '1'
+
+if IS_VERCEL:
+    tmp_db = '/tmp/db.sqlite3'
+    original_db = BASE_DIR / 'db.sqlite3'
+    if not os.path.exists(tmp_db) and original_db.exists():
+        try:
+            shutil.copyfile(original_db, tmp_db)
+        except Exception:
+            pass
+    db_path = tmp_db
+else:
+    db_path = BASE_DIR / 'db.sqlite3'
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': db_path,
     }
 }
 
